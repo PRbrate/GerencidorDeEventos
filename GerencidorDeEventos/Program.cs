@@ -2,6 +2,8 @@ using GerencidorDeEventos;
 using GerencidorDeEventos.ApiConfig;
 using GerencidorDeEventos.Repository;
 using GerencidorDeEventos.Repository.Interface;
+using GerencidorDeEventos.Service;
+using GerencidorDeEventos.Service.inteface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -31,15 +33,21 @@ builder.Services.AddAuthentication(x =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateIssuer = false,
-        ValidateAudience = false
+        ValidateAudience = false,
+        ValidateLifetime = true,
     };
 });
 
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.AddSwaggerConfig();
+builder.Services.AddScoped<DataBaseContext>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>(); 
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+
+
 
 builder.Services.AddDbContext<DataBaseContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Connection")));
 
-builder.AddSwaggerConfig();
+
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.

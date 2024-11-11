@@ -18,7 +18,7 @@ namespace GerencidorDeEventos.Service
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, usuario.Nome.ToString() ),
+                    new Claim(ClaimTypes.Email, usuario.Email.ToString() ),
                     new Claim(ClaimTypes.Role, usuario.Roles.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(15),
@@ -30,6 +30,23 @@ namespace GerencidorDeEventos.Service
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        public static string GetEmailFromToken(string token) 
+        { 
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            
+            var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
+
+            return emailClaim;
+
+        }
+
+        public static bool IsTokenEmailValid(string token, string expectedEmail)
+        {
+            var emailFromToken = GetEmailFromToken(token);
+            return emailFromToken == expectedEmail;
         }
     }
 }
