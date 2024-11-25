@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GerencidorDeEventos.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class colunaAdministrador : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,7 @@ namespace GerencidorDeEventos.Migrations
                     Nome = table.Column<string>(type: "character varying(100)", unicode: false, maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "character varying(100)", unicode: false, maxLength: 100, nullable: false),
                     Senha = table.Column<string>(type: "character varying(100)", unicode: false, maxLength: 100, nullable: false),
-                    Roles = table.Column<string>(type: "character varying(100)", unicode: false, maxLength: 100, nullable: false)
+                    Administrador = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {

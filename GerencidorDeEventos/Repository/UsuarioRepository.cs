@@ -16,6 +16,7 @@ namespace GerencidorDeEventos.Repository
 
         public async Task<Usuario> AtualizarUsuario(Usuario usuario)
         {
+
             _dbcontext.Usuarios.Update(usuario);
             await _dbcontext.SaveChangesAsync();
             return usuario;
@@ -25,7 +26,7 @@ namespace GerencidorDeEventos.Repository
         {
 
             _dbcontext.Usuarios.Add(usuario);
-            await _dbcontext.SaveChangesAsync();
+            var teste = await _dbcontext.SaveChangesAsync();
 
             return usuario;
         }
@@ -69,6 +70,12 @@ namespace GerencidorDeEventos.Repository
         {
             var usuario =  _dbcontext.Usuarios.FirstOrDefault(x => x.Cpf.ToLower() == cpf.ToLower());
             return usuario;
+        }
+
+        public bool detached(Usuario usuario)
+        {
+            _dbcontext.Entry(usuario).State = EntityState.Detached;
+            return true;
         }
     }
 }

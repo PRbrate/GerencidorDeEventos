@@ -4,19 +4,36 @@ using GerencidorDeEventos.Repository;
 using GerencidorDeEventos.Repository.Interface;
 using GerencidorDeEventos.Service;
 using GerencidorDeEventos.Service.inteface;
+using GerencidorDeEventos.Service.Validations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
 
+builder.Services.AddSwaggerGen(options =>
+{
+    options.MapType<DateTime>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Format = "date", // Define apenas a data no Swagger
+        Example = new Microsoft.OpenApi.Any.OpenApiString("2024-11-20")
+    });
+});
 
 var key = Encoding.ASCII.GetBytes(SenhaToken.Secret);
 
@@ -38,11 +55,30 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
+builder.Services.AddAuthorization(x =>
+{
+    x.AddPolicy("autorizado", policy =>
+    policy.RequireClaim("administrador", "true"));
+});
+
 builder.AddSwaggerConfig();
 builder.Services.AddScoped<DataBaseContext>();
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>(); 
-builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IvalidaUsuarioAtualizacao, ValidaUsuarioAtualizacao>();
+
+builder.Services.AddScoped<IEventoService, EventoService>();
+builder.Services.AddScoped<IEventoRepository, EventoRepository>();
+
+builder.Services.AddScoped<IInscricoesRepository, InscricoesRepository>();
+builder.Services.AddScoped<IInscricaoService, InscricoesService>();
+
+builder.Services.AddScoped<IMinicursoRepository, MinicursoRepository>();
+builder.Services.AddScoped<IMinicursoService, MinicursoService>();
+
+builder.Services.AddScoped<IPalestraRepository, PalestraRepository>();
+builder.Services.AddScoped<IPalestraService, PalestraService>();
 
 
 builder.Services.AddDbContext<DataBaseContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Connection")));
@@ -56,6 +92,7 @@ if (app.Environment.IsDevelopment())
 
 }
 
+app.UseRouting();
 app.UseSwagger();
 app.UseSwaggerUI();
 

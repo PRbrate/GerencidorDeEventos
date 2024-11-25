@@ -3,6 +3,7 @@ using System;
 using GerencidorDeEventos.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GerencidorDeEventos.Migrations
 {
     [DbContext(typeof(DataBaseContext))]
-    partial class DataBaseContextModelSnapshot : ModelSnapshot
+    [Migration("20241123215805_UpdatePalestraseMinicursos")]
+    partial class UpdatePalestraseMinicursos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,23 +115,11 @@ namespace GerencidorDeEventos.Migrations
                     b.Property<int>("MinicursoId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Telefone")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("character varying(100)");
-
                     b.HasKey("UsuarioId", "MinicursoId");
 
                     b.HasIndex("MinicursoId");
 
-                    b.ToTable("InscricoesMinicurso");
+                    b.ToTable("InscricaoMinicurso");
                 });
 
             modelBuilder.Entity("GerencidorDeEventos.Model.InscricaoPalestra", b =>
@@ -139,23 +130,11 @@ namespace GerencidorDeEventos.Migrations
                     b.Property<int>("PalestraId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Telefone")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("character varying(100)");
-
                     b.HasKey("UsuarioId", "PalestraId");
 
                     b.HasIndex("PalestraId");
 
-                    b.ToTable("InscricoesPalestra");
+                    b.ToTable("InscricaoPalestra");
                 });
 
             modelBuilder.Entity("GerencidorDeEventos.Model.Minicurso", b =>
@@ -212,7 +191,7 @@ namespace GerencidorDeEventos.Migrations
                     b.ToTable("Minicursos");
                 });
 
-            modelBuilder.Entity("GerencidorDeEventos.Model.Palestra", b =>
+            modelBuilder.Entity("GerencidorDeEventos.Model.Palestras", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -240,6 +219,12 @@ namespace GerencidorDeEventos.Migrations
 
                     b.Property<int>("EventoId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("HoraFim")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<TimeSpan>("HoraInicio")
+                        .HasColumnType("interval");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -340,7 +325,7 @@ namespace GerencidorDeEventos.Migrations
 
             modelBuilder.Entity("GerencidorDeEventos.Model.InscricaoPalestra", b =>
                 {
-                    b.HasOne("GerencidorDeEventos.Model.Palestra", "Palestra")
+                    b.HasOne("GerencidorDeEventos.Model.Palestras", "Palestra")
                         .WithMany("Inscricoes")
                         .HasForeignKey("PalestraId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -368,7 +353,7 @@ namespace GerencidorDeEventos.Migrations
                     b.Navigation("Evento");
                 });
 
-            modelBuilder.Entity("GerencidorDeEventos.Model.Palestra", b =>
+            modelBuilder.Entity("GerencidorDeEventos.Model.Palestras", b =>
                 {
                     b.HasOne("GerencidorDeEventos.Model.Evento", "Evento")
                         .WithMany("Palestras")
@@ -393,7 +378,7 @@ namespace GerencidorDeEventos.Migrations
                     b.Navigation("Inscricoes");
                 });
 
-            modelBuilder.Entity("GerencidorDeEventos.Model.Palestra", b =>
+            modelBuilder.Entity("GerencidorDeEventos.Model.Palestras", b =>
                 {
                     b.Navigation("Inscricoes");
                 });

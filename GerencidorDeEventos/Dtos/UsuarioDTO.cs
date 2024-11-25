@@ -2,18 +2,20 @@
 {
     public class UsuarioDTO
     {
-        public UsuarioDTO(int id, string nome, string email, string roles, string cpf)
+        public UsuarioDTO(string cpf, string nome, string email, string senha)
         {
+            Cpf = cpf;
             Nome = nome;
             Email = email;
-            Roles = roles;
-            Cpf = cpf;
+            Senha = senha;
         }
 
+        public string Cpf { get; set; }
         public string Nome { get; set; }
         public string Email { get; set; }
-        public string Roles { get; set; }
-        public string Cpf { get; set; }
+        public string Senha { get; set; }
+
+
 
     }
 }

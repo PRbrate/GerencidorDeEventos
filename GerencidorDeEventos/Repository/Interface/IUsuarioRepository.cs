@@ -12,7 +12,7 @@ namespace GerencidorDeEventos.Repository.Interface
         Usuario GetUsuarioByEmail(string email);
         Task<Usuario> DeleteUsuario(Usuario usuario);
         Usuario GetUserByCpf(string cpf);
-
+        bool detached(Usuario usuario);
 
     }
 }

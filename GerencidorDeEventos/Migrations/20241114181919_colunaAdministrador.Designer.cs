@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GerencidorDeEventos.Migrations
 {
     [DbContext(typeof(DataBaseContext))]
-    [Migration("20241110194506_Initial")]
-    partial class Initial
+    [Migration("20241114181919_colunaAdministrador")]
+    partial class colunaAdministrador
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,9 @@ namespace GerencidorDeEventos.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Administrador")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Cpf")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -45,12 +48,6 @@ namespace GerencidorDeEventos.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(false)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Roles")
                         .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(false)

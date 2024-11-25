@@ -18,8 +18,9 @@ namespace GerencidorDeEventos.Service
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Email, usuario.Email.ToString() ),
-                    new Claim(ClaimTypes.Role, usuario.Roles.ToString())
+                    new Claim("cpf", usuario.Cpf),
+                    new Claim(ClaimTypes.Email, usuario.Email.ToString()),
+                    new Claim(ClaimTypes.Role, usuario.Administrador.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(15),
 
@@ -32,21 +33,32 @@ namespace GerencidorDeEventos.Service
             return tokenHandler.WriteToken(token);
         }
 
-        public static string GetEmailFromToken(string token) 
+        public static string GetCpfFromToken(string token) 
         { 
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
             
+            var cpfClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "cpf")?.Value;
+
+            return cpfClaim;
+
+        }
+
+        public static string GetEmailFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
             var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
 
             return emailClaim;
 
         }
 
-        public static bool IsTokenEmailValid(string token, string expectedEmail)
+        public static bool IsTokenCpfValid(string token, string expectedCpf)
         {
-            var emailFromToken = GetEmailFromToken(token);
-            return emailFromToken == expectedEmail;
+            var cpfFromToken = GetCpfFromToken(token);
+            return cpfFromToken == expectedCpf;
         }
     }
 }
