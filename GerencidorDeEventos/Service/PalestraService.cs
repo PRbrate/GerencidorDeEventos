@@ -23,6 +23,7 @@ namespace GerencidorDeEventos.Service
             var palestraRepository = await _palestraRepository.GetPalestrasById(id);
             var evento = await _eventoRepository.GetEventoById(plf.EventoId);
 
+            var palestra = insertPalestra(palestraRepository, plf);
 
             if (palestraRepository == null)
             {
@@ -78,14 +79,13 @@ namespace GerencidorDeEventos.Service
                 var erromessage = new ErroMessage("Não possivel inscrever uma palestra que acabe depois do evento");
                 return erromessage;
             }
-
-            var palestra = new Palestra(plf.EventoId, plf.Nome, plf.Descricao, plf.DataInicio, plf.DataFim, plf.Palestrante, plf.CurriculoPalestrante);
+           
             palestra.DataInicio = dataInicio;
             palestra.DataFim = dataFim;
             palestra.Id = palestraRepository.Id;
             _palestraRepository.detached(palestraRepository);
             var plr = await _palestraRepository.AtualizarPalestra(palestra);
-            var plrdto = new PalestraDto(plr.EventoId, plr.Nome, plr.Descricao, plr.DataInicio.ToString(), plr.DataInicio.ToString("HH.mm"), plr.DataFim.Hour.ToString("HH.mm"), plr.Palestrante, plr.CurriculoPalestrante);
+            var plrdto = new PalestraDto(plr.EventoId, plr.Id, plr.Nome, plr.Descricao, plr.DataInicio.ToString(), plr.DataInicio.ToString("HH.mm"), plr.DataFim.ToString("HH.mm"), plr.Palestrante, plr.CurriculoPalestrante);
             return plrdto;
 
         }
@@ -117,7 +117,7 @@ namespace GerencidorDeEventos.Service
                 var erromessage = new ErroMessage("A data da palestra não pode ser menor que a data atual");
                 return erromessage;
             }
-            else if (dataInicio >= dataFim)
+            else if (dataInicio > dataFim)
             {
                 var erromessage = new ErroMessage("A horário de término não pode ser antecedente ao horário de inicio");
                 return erromessage;
@@ -143,7 +143,7 @@ namespace GerencidorDeEventos.Service
             palestra.DataInicio = dataInicio;
             palestra.DataFim = dataFim;
             var plr = await _palestraRepository.CriarPalestra(palestra);
-            var plrdto = new PalestraDto(plr.EventoId, plr.Nome, plr.Descricao, plr.DataInicio.ToString(), plr.DataInicio.ToString("HH.mm"), plr.DataFim.Hour.ToString("HH.mm"), plr.Palestrante, plr.CurriculoPalestrante);
+            var plrdto = new PalestraDto(plr.EventoId, plr.Id, plr.Nome, plr.Descricao, plr.DataInicio.ToString(), plr.DataInicio.ToString("HH.mm"), plr.DataFim.ToString("HH.mm"), plr.Palestrante, plr.CurriculoPalestrante);
             return plrdto;
         }
 
@@ -158,7 +158,7 @@ namespace GerencidorDeEventos.Service
                     var Erromessage = new ErroMessage("Palestra não encontrado com esse ID");
                     return Erromessage;
                 }
-                if (palestra.DataInicio.Day == DateTime.Now.Day)
+                if (palestra.DataInicio == DateTime.Now)
                 {
                     var Erromessage = new ErroMessage("O Palestra só pode ser removido antes da data de inicio");
                     return Erromessage;
@@ -191,10 +191,40 @@ namespace GerencidorDeEventos.Service
 
             foreach (var mc in palestras)
             {
-                var mcdto = new PalestraDto(mc.EventoId, mc.Nome, mc.Descricao, mc.DataInicio.ToString(), mc.DataInicio.ToString("HH.mm"), mc.DataFim.Hour.ToString("HH.mm"), mc.Palestrante, mc.CurriculoPalestrante);
+                var mcdto = new PalestraDto(mc.EventoId, mc.Id,  mc.Nome, mc.Descricao, mc.DataInicio.ToString(), mc.DataInicio.ToString("HH.mm"), mc.DataFim.ToString("HH.mm"), mc.Palestrante, mc.CurriculoPalestrante);
                 palestraDtos.Add(mcdto);
             }
             return palestraDtos;
+        }
+
+        public Palestra insertPalestra(Palestra palestra, PalestraFilter insert)
+        {
+
+            if (!string.IsNullOrEmpty(insert.Descricao))
+            {
+                palestra.Descricao = insert.Descricao;
+            }
+            if (!string.IsNullOrEmpty(insert.CurriculoPalestrante))
+            {
+                palestra.CurriculoPalestrante = insert.CurriculoPalestrante;
+            }
+            if (!(insert.DataFim == DateTime.MinValue))
+            {
+                palestra.DataFim = insert.DataFim;
+            }
+            if (!(insert.DataInicio == DateTime.MinValue))
+            {
+                palestra.DataInicio = insert.DataInicio;
+            }
+            if (!string.IsNullOrEmpty(insert.Nome))
+            {
+                palestra.Nome = insert.Nome;
+            }
+            if (!string.IsNullOrEmpty(insert.Palestrante))
+            {
+                palestra.Palestrante = insert.Palestrante;
+            }
+            return palestra;
         }
     }
 }

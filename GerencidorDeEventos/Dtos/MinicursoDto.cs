@@ -4,9 +4,10 @@ namespace GerencidorDeEventos.Dtos
 {
     public class MinicursoDto
     {
-        public MinicursoDto(int id_evento, string nome, string descricao, string dt_minicurso, string hora_inicio_minicurso, string hora_fim_minicurso, string nome_instrutor, string minicurriculo_instrutor, int numero_vagas, string dt_limite_inscricao)
+        public MinicursoDto(int id_evento,int id_minicurso, string nome, string descricao, string dt_minicurso, string hora_inicio_minicurso, string hora_fim_minicurso, string nome_instrutor, string minicurriculo_instrutor, int numero_vagas, string dt_limite_inscricao)
         {
             this.id_evento = id_evento;
+            this.id_minicurso = id_minicurso;
             this.nome = nome;
             this.descricao = descricao;
             this.dt_minicurso = dt_minicurso;
@@ -20,6 +21,7 @@ namespace GerencidorDeEventos.Dtos
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? id_evento { get; set; }
+        public int? id_minicurso { get; set; }
         public string nome { get; set; }
         public string descricao { get; set; }
         public string dt_minicurso { get; set; }

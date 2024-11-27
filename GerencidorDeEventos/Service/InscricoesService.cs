@@ -27,9 +27,9 @@ namespace GerencidorDeEventos.Service
         public async Task<dynamic> InscricaoEventoService(int Idevento, string token, string telefone)
         {
 
-            var cpf = TokenService.GetCpfFromToken(token);
+            var id = TokenService.GetIdFromToken(token);
             var evento = await _eventoRepository.GetEventoById(Idevento);
-            var usuario = _usuarioRepository.GetUserByCpf(cpf);
+            var usuario = await _usuarioRepository.GetUsuarioById(int.Parse(id));
             var usuarios = _inscricoesRepository.ObterUsuariosInscritosEvento(Idevento);
 
             if (usuarios.Any(u => u.Id == usuario.Id))
@@ -47,7 +47,7 @@ namespace GerencidorDeEventos.Service
                 var Erromessage = new ErroMessage("Evento não Encontrado, por favor digite outro ID");
                 return Erromessage;
             }
-            if (evento.DataLimiteInscricao <= DateTime.Now)
+            if (evento.DataLimiteInscricao < DateTime.Now)
             {
                 var Erromessage = new ErroMessage("Prazo para a inscrição já passou");
                 return Erromessage;
@@ -86,7 +86,7 @@ namespace GerencidorDeEventos.Service
                 var Erromessage = new ErroMessage("Usuário não está cadastrado no evento");
                 return Erromessage;
             }
-            if (evento.DataInicio.Day <= DateTime.Now.Day + 1)
+            if (evento.DataInicio <= DateTime.Now.AddDays(1))
             {
                 var Erromessage = new ErroMessage("O cancelamento da inscrição deve ser feita com 24 horas de antecedência");
                 return Erromessage;
@@ -131,7 +131,7 @@ namespace GerencidorDeEventos.Service
         {
 
 
-            var cpf = TokenService.GetCpfFromToken(token);
+            var id = TokenService.GetIdFromToken(token);
             var minicurso = await _minicursoRepository.GetMinicursoById(IdMinicurso);
 
             if (minicurso == null)
@@ -140,7 +140,7 @@ namespace GerencidorDeEventos.Service
                 return Erromessage;
             }
 
-            var usuario = _usuarioRepository.GetUserByCpf(cpf);
+            var usuario = await _usuarioRepository.GetUsuarioById(int.Parse(id));
             var usuariosEvento = _inscricoesRepository.ObterUsuariosInscritosEvento(minicurso.EventoId);
             var usuariosMinicurso = _inscricoesRepository.ObterUsuariosInscritosMinicurso(IdMinicurso);
             var inscricaoEvento = await _inscricoesRepository.GetInscricao(minicurso.EventoId, usuario.Id);
@@ -157,7 +157,7 @@ namespace GerencidorDeEventos.Service
                 return erromessage;
             }
 
-            if (minicurso.LimiteInscricao <= DateTime.Now)
+            if (minicurso.LimiteInscricao < DateTime.Now)
             {
                 var Erromessage = new ErroMessage("Prazo para a inscrição já passou");
                 return Erromessage;
@@ -241,9 +241,9 @@ namespace GerencidorDeEventos.Service
         public async Task<dynamic> InscricaoPalestraService(int IdPalestra, string token)
         {
 
-            var cpf = TokenService.GetCpfFromToken(token);
+            var id = TokenService.GetIdFromToken(token);
             var palestra = await _palestraRepository.GetPalestrasById(IdPalestra);
-            var usuario = _usuarioRepository.GetUserByCpf(cpf);
+            var usuario = await _usuarioRepository.GetUsuarioById(int.Parse(id));
             var usuariosEvento = _inscricoesRepository.ObterUsuariosInscritosEvento(palestra.EventoId);
             var usuariosPalestra = _inscricoesRepository.ObterUsuariosInscritosPalestra(IdPalestra);
             var inscricaoEvento = await _inscricoesRepository.GetInscricao(palestra.EventoId, usuario.Id);

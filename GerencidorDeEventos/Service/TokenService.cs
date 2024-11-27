@@ -18,7 +18,7 @@ namespace GerencidorDeEventos.Service
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim("cpf", usuario.Cpf),
+                    new Claim("id", usuario.Id.ToString()),
                     new Claim(ClaimTypes.Email, usuario.Email.ToString()),
                     new Claim(ClaimTypes.Role, usuario.Administrador.ToString())
                 }),
@@ -55,10 +55,34 @@ namespace GerencidorDeEventos.Service
 
         }
 
+        public static string GetIdFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var idClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+            return idClaim;
+
+        }
+
+        public static string GetRoleFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+
+            return roleClaim;
+        }
+
         public static bool IsTokenCpfValid(string token, string expectedCpf)
         {
             var cpfFromToken = GetCpfFromToken(token);
             return cpfFromToken == expectedCpf;
         }
+
+
     }
 }

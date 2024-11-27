@@ -23,68 +23,72 @@ namespace GerencidorDeEventos.Service
 
         public async Task<dynamic> AtualizarUsuarioService(UsuarioFilter usuarioFilter, string token, int id)
         {
-
-            if (TokenService.IsTokenCpfValid(token, usuarioFilter.Cpf))
+            try
             {
+                var usuarioBanco = await _usuarioRepository.GetUsuarioById(id);
+
+                var taskId = TokenService.GetIdFromToken(token) == id.ToString();
+                var taskRole = TokenService.GetRoleFromToken(token);
+
+                if (taskId == false && taskRole == "False")
+                {
+                    var Erromessage = new ErroMessage("Você só pode fazer alteração do seu prório Usuário");
+                    return Erromessage;
+                }
+
+
                 //var tokenCpf = TokenService.GetCpfFromToken(token);
                 //var tokenEmail = TokenService.GetEmailFromToken(token);
                 var senhaHash = usuarioFilter.Senha;
-
-                if (ValidaSenhaService.VerificarSenha(senhaHash))
+                if (!string.IsNullOrEmpty(senhaHash))
                 {
-                    usuarioFilter.Senha = SenhaHashService.SenhaPasword(senhaHash);
-                }
-                else
-                {
-                    var Erromessage = new ErroMessage("Senha deve ter 8 caracteres sendo maiucula minuscula e caracteres especiais");
-                    return Erromessage;
-                    
-                }
-                if (!ValidaEmailService.VerificaEmail(usuarioFilter.Email))
-                {
-                    var Erromessage = new ErroMessage("e-mail inválido");
-                    return Erromessage;
-                }
-                if (!ValidaCpfService.ValidarCPF(usuarioFilter.Cpf))
-                {
-                    var Erromessage = new ErroMessage("cpf inválido");
-                    return Erromessage;
-                }
-                if (_validaUsuarioAtualizacao.validaEmailCpfToken(usuarioFilter.Email, usuarioFilter.Cpf))
-                {
-
-                    var usuario = new Usuario(usuarioFilter.Cpf, usuarioFilter.Nome, usuarioFilter.Email, usuarioFilter.Senha);
-
-                    var usuarioBanco = await _usuarioRepository.GetUsuarioById(id);
-
-                    if (usuarioBanco != null)
+                    if (ValidaSenhaService.VerificarSenha(senhaHash))
                     {
-                        if(usuarioBanco.Administrador)
-                        {
-                            usuario.Administrador = true;
-                        }
-                        _usuarioRepository.detached(usuarioBanco);
-                        usuario.Id = usuarioBanco.Id;
-                        await _usuarioRepository.AtualizarUsuario(usuario);
-
-                        var user = new UsuarioDTO(usuario.Cpf, usuario.Nome, usuario.Email, usuario.Senha);
-                        return user;
+                        usuarioFilter.Senha = SenhaHashService.SenhaPasword(senhaHash);
                     }
-                    throw new Exception("Usuário Não encontrado para a atualização");
-                }
-                else
-                {
-                    var Erromessage = new ErroMessage("Esse e-mail já está cadastrado");
-                    return Erromessage;
-                }
-            }
-            else
-            {
-                var Erromessage = new ErroMessage("Você só pode fazer alteração do seu prório Usuário");
-                return Erromessage;
-            }
+                    else
+                    {
+                        var Erromessage = new ErroMessage("Senha deve ter 8 caracteres sendo maiucula minuscula e caracteres especiais");
+                        return Erromessage;
 
- 
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(senhaHash))
+                {
+                    if (!ValidaEmailService.VerificaEmail(usuarioFilter.Email))
+                    {
+                        if (TokenService.GetEmailFromToken(token) != usuarioFilter.Email)
+                        {
+                            var Erromessage = new ErroMessage("e-mail inválido");
+                            return Erromessage;
+                        }
+                    }
+                }
+
+                var usuario = InsertUsuario(usuarioBanco, usuarioFilter);
+
+                if (usuarioBanco != null)
+                {
+                    if (usuarioBanco.Administrador)
+                    {
+                        usuario.Administrador = true;
+                    }
+                    _usuarioRepository.detached(usuarioBanco);
+                    usuario.Id = usuarioBanco.Id;
+                    await _usuarioRepository.AtualizarUsuario(usuario);
+
+                    var user = new UsuarioDTO(usuario.Cpf, usuario.Nome, usuario.Email, usuario.Senha);
+                    return user;
+                }
+                throw new Exception("Usuário Não encontrado para a atualização");
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<dynamic> CriarUsuarioService(UsuarioFilter usuarioFilter)
@@ -99,7 +103,7 @@ namespace GerencidorDeEventos.Service
             {
                 var Erromessage = new ErroMessage("Senha deve ter 8 caracteres sendo maiucula minuscula e caracteres especiais");
                 return Erromessage;
-   
+
             }
             if (!ValidaEmailService.VerificaEmail(usuarioFilter.Email))
             {
@@ -143,7 +147,7 @@ namespace GerencidorDeEventos.Service
 
                 var remove = _usuarioRepository.DeleteUsuario(user);
 
-                if(!remove.IsCompletedSuccessfully == false)
+                if (!remove.IsCompletedSuccessfully == false)
                 {
                     var Erromessage = new ErroMessage("usuário não removido");
                     return Erromessage;
@@ -172,7 +176,7 @@ namespace GerencidorDeEventos.Service
         public async Task<dynamic> PromoveUsuarioService(int id)
         {
 
-            var usuario =  await _usuarioRepository.GetUsuarioById(id);
+            var usuario = await _usuarioRepository.GetUsuarioById(id);
 
             if (usuario == null)
             {
@@ -185,12 +189,10 @@ namespace GerencidorDeEventos.Service
 
             return resultado;
         }
-
-
         public async Task<dynamic> UsuarioAuthenticatorService(string cpf, string senha)
         {
             bool validaSenha;
-            
+
 
             if (ValidaSenhaService.VerificarSenha(senha))
             {
@@ -233,6 +235,23 @@ namespace GerencidorDeEventos.Service
                 var Erromessage = new ErroMessage("Senha deve ter 8 caracteres sendo maiucula minuscula e caracteres");
                 return Erromessage;
             }
+        }
+
+        public Usuario InsertUsuario(Usuario usuario, UsuarioFilter insert)
+        {
+            if (!string.IsNullOrEmpty(insert.Email))
+            {
+                usuario.Email = insert.Email;
+            }
+            if (!string.IsNullOrEmpty(insert.Nome))
+            {
+                usuario.Nome = insert.Nome;
+            }
+            if (!string.IsNullOrEmpty(insert.Senha))
+            {
+                usuario.Senha = insert.Senha;
+            }
+            return usuario;
         }
     }
 }

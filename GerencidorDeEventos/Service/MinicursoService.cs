@@ -5,6 +5,7 @@ using GerencidorDeEventos.Repository;
 using GerencidorDeEventos.Repository.Interface;
 using GerencidorDeEventos.Service.inteface;
 using GerencidorDeEventos.Service.Validations;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GerencidorDeEventos.Service
@@ -26,13 +27,14 @@ namespace GerencidorDeEventos.Service
             var minicursoRepository = await _minicursoRepository.GetMinicursoById(id);
             var evento = await _eventoRepository.GetEventoById(mcf.EventoId);
 
+            var minicurso = insertMinicurso(minicursoRepository, mcf);
+
 
             if (minicursoRepository == null)
             {
                 var erromessage = new ErroMessage("Não foi encontrado nenhum Minicurso com o ID digitado");
                 return erromessage;
             }
-
             if (DateTime.Now == minicursoRepository.DataInicio)
             {
                 var erromessage = new ErroMessage("A atualização só pode ser feita antes do dia do minicurso");
@@ -50,65 +52,65 @@ namespace GerencidorDeEventos.Service
                 var erromessage = new ErroMessage("Não possui evento com o Id digitado");
                 return erromessage;
             }
-            if (mcf.QuantidadeDeVagas > evento.NumVagas)
+            if (minicurso.QuantidadeDeVagas > evento.NumVagas)
             {
                 var erromessage = new ErroMessage("Você não pode ofertar um minicurso com mais vagas que o evento");
                 return erromessage;
             }
-            if (mcf.LimiteInscricao > evento.DataLimiteInscricao)
+            if (minicurso.LimiteInscricao > evento.DataLimiteInscricao)
             {
                 var erromessage = new ErroMessage("A data limite de inscrição não pode ser maior que a data de inscrição limite do evento");
                 return erromessage;
             }
-            if (mcf.LimiteInscricao < DateTime.Now)
+            if (minicurso.LimiteInscricao < DateTime.Now)
             {
                 var erromessage = new ErroMessage("Não é possivel a data limite da inscrição ser retrocedente a hoje");
                 return erromessage;
             }
-            if (mcf.DataInicio > mcf.DataFim)
+            if (minicurso.DataInicio > minicurso.DataFim)
             {
                 var erromessage = new ErroMessage("a data do minicurso não pode ser retrocedente a data final");
                 return erromessage;
             }
-            else if (mcf.DataInicio < DateTime.Now)
+            else if (minicurso.DataInicio < DateTime.Now)
             {
                 var erromessage = new ErroMessage("A data do evento não pode ser menos que a data atual");
                 return erromessage;
             }
-            else if (dataInicio >= dataFim)
+            else if (dataInicio.Hour > dataFim.Hour)
             {
                 var erromessage = new ErroMessage("A horário de término não pode ser antecedente ao horário de inicio");
                 return erromessage;
             }
 
-            if (mcf.Nome == "string" || mcf.Descricao == "string" || mcf.CurriculoPalestrante == "string" || mcf.Palestrante == "string")
+            if (minicurso.Nome == "string" || minicurso.Descricao == "string" || minicurso.CurriculoPalestrante == "string" || minicurso.Palestrante == "string")
             {
                 var erromessage = new ErroMessage("Nome, descrição, CurriculoPalestrante e palestrante não podem ser 'string' digite nomes válidos");
                 return erromessage;
             }
-            if (mcf.QuantidadeDeVagas <= 0)
+            if (minicurso.QuantidadeDeVagas <= 0)
             {
                 var erromessage = new ErroMessage("Não é possivel inscrever um Minicurso sem vagas");
                 return erromessage;
             }
-            if (mcf.DataInicio < evento.DataInicio)
+            if (minicurso.DataInicio < evento.DataInicio)
             {
                 var erromessage = new ErroMessage("Não possivel inscrever um minicurso que aconteca antes do evento");
                 return erromessage;
             }
-            if (mcf.DataFim > evento.DataFim)
+            if (minicurso.DataFim > evento.DataFim)
             {
                 var erromessage = new ErroMessage("Não possivel inscrever um minicurso que acabe depois do evento");
                 return erromessage;
             }
 
-            var minicurso = new Minicurso(mcf.EventoId, mcf.Nome, mcf.Descricao, mcf.DataInicio, mcf.DataFim, mcf.Palestrante, mcf.CurriculoPalestrante, mcf.QuantidadeDeVagas, mcf.LimiteInscricao);
+
             minicurso.DataInicio = dataInicio;
             minicurso.DataFim = dataFim;
             minicurso.Id = minicursoRepository.Id;
             _minicursoRepository.detached(minicursoRepository);
             var mcr = await _minicursoRepository.AtualizarMinicurso(minicurso);
-            var mcrdto = new MinicursoDto(mcr.EventoId, mcr.Nome, mcr.Descricao, mcr.DataInicio.ToString(), mcr.DataInicio.ToString("HH.mm"), mcr.DataFim.Hour.ToString("HH.mm"), mcr.Palestrante, mcr.CurriculoPalestrante, mcr.QuantidadeDeVagas, mcr.LimiteInscricao.ToString());
+            var mcrdto = new MinicursoDto(mcr.EventoId, mcr.Id, mcr.Nome, mcr.Descricao, mcr.DataInicio.ToString(), mcr.DataInicio.ToString("HH.mm"), mcr.DataFim.ToString("HH.mm"), mcr.Palestrante, mcr.CurriculoPalestrante, mcr.QuantidadeDeVagas, mcr.LimiteInscricao.ToString());
             return mcrdto;
 
         }
@@ -155,12 +157,11 @@ namespace GerencidorDeEventos.Service
                 var erromessage = new ErroMessage("A data do evento não pode ser menos que a data atual");
                 return erromessage;
             }
-            else if (dataInicio >= dataFim)
+            else if (dataInicio > dataFim)
             {
                 var erromessage = new ErroMessage("A horário de término não pode ser antecedente ao horário de inicio");
                 return erromessage;
             }
-
             if (mcf.Nome == "string" || mcf.Descricao == "string" || mcf.CurriculoPalestrante == "string" || mcf.Palestrante == "string")
             {
                 var erromessage = new ErroMessage("Nome, descrição, CurriculoPalestrante e palestrante não podem ser 'string' digite nomes válidos");
@@ -176,7 +177,7 @@ namespace GerencidorDeEventos.Service
                 var erromessage = new ErroMessage("Não possivel inscrever um minicurso que aconteca antes do evento");
                 return erromessage;
             }
-            if(mcf.DataFim > evento.DataFim)
+            if(mcf.DataFim.DayOfWeek > evento.DataFim.DayOfWeek)
             {
                 var erromessage = new ErroMessage("Não possivel inscrever um minicurso que acabe depois do evento");
                 return erromessage;
@@ -186,7 +187,7 @@ namespace GerencidorDeEventos.Service
             minicurso.DataInicio = dataInicio;
             minicurso.DataFim = dataFim;
             var mcr = await _minicursoRepository.CriarMinicurso(minicurso);
-            var mcrdto = new MinicursoDto(mcr.EventoId, mcr.Nome, mcr.Descricao, mcr.DataInicio.ToString(), mcr.DataInicio.ToString("HH.mm"), mcr.DataFim.Hour.ToString("HH.mm"), mcr.Palestrante, mcr.CurriculoPalestrante, mcr.QuantidadeDeVagas, mcr.LimiteInscricao.ToString());
+            var mcrdto = new MinicursoDto(mcr.EventoId, mcr.Id, mcr.Nome, mcr.Descricao, mcr.DataInicio.ToString(), mcr.DataInicio.ToString("HH.mm"), mcr.DataFim.ToString("HH.mm"), mcr.Palestrante, mcr.CurriculoPalestrante, mcr.QuantidadeDeVagas, mcr.LimiteInscricao.ToString());
             return mcrdto;
         }
 
@@ -201,7 +202,7 @@ namespace GerencidorDeEventos.Service
                     var Erromessage = new ErroMessage("Minicurso não encontrado com esse ID");
                     return Erromessage;
                 }
-                if (minicurso.DataInicio.Day == DateTime.Now.Day)
+                if (minicurso.DataInicio == DateTime.Now)
                 {
                     var Erromessage = new ErroMessage("O Minicurso só pode ser removido antes da data de inicio");
                     return Erromessage;
@@ -210,7 +211,6 @@ namespace GerencidorDeEventos.Service
                 {
                     var Erromessage = new ErroMessage("O Minicurso não pode ser removido pois tem participantes incritos");
                     return Erromessage;
-
                 }
 
                 var remove = _minicursoRepository.RemoverMonicurso(minicurso);
@@ -239,10 +239,48 @@ namespace GerencidorDeEventos.Service
 
             foreach (var mc in minicurso)
             {
-                var mcdto = new MinicursoDto(mc.EventoId, mc.Nome, mc.Descricao, mc.DataInicio.ToString(), mc.DataInicio.ToString("HH.mm"), mc.DataFim.Hour.ToString("HH.mm"), mc.Palestrante, mc.CurriculoPalestrante, mc.QuantidadeDeVagas, mc.LimiteInscricao.ToString());
+                var mcdto = new MinicursoDto(mc.EventoId, mc.Id, mc.Nome, mc.Descricao, mc.DataInicio.ToString(), mc.DataInicio.ToString("HH.mm"), mc.DataFim.ToString("HH.mm"), mc.Palestrante, mc.CurriculoPalestrante, mc.QuantidadeDeVagas, mc.LimiteInscricao.ToString());
                 minicursoDto.Add(mcdto);
             }
             return minicursoDto;
+        }
+
+        public Minicurso insertMinicurso(Minicurso minicurso, MinicursoFilter insert)
+        {
+
+            if(insert.QuantidadeDeVagas >= 0)
+            {
+                minicurso.QuantidadeDeVagas = insert.QuantidadeDeVagas;
+            }
+            if(!string.IsNullOrEmpty(insert.Descricao))
+            {
+                minicurso.Descricao = insert.Descricao;
+            }
+            if (!string.IsNullOrEmpty(insert.CurriculoPalestrante))
+            {
+                minicurso.CurriculoPalestrante = insert.CurriculoPalestrante;
+            }
+            if(!(insert.DataFim == DateTime.MinValue))
+            {
+                minicurso.DataFim = insert.DataFim;
+            }
+            if(!(insert.DataInicio == DateTime.MinValue))
+            {
+                minicurso.DataInicio = insert.DataInicio;
+            }
+            if(!(insert.LimiteInscricao == DateTime.MinValue))
+            {
+                minicurso.LimiteInscricao = insert.LimiteInscricao;
+            }
+            if (!string.IsNullOrEmpty(insert.Nome))
+            {
+                minicurso.Nome = insert.Nome;
+            }
+            if (!string.IsNullOrEmpty(insert.Palestrante))
+            {
+                minicurso.Palestrante = insert.Palestrante;
+            }
+            return minicurso; 
         }
     }
 }

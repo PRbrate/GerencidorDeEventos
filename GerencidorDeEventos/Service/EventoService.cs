@@ -4,6 +4,7 @@ using GerencidorDeEventos.Model;
 using GerencidorDeEventos.Repository.Interface;
 using GerencidorDeEventos.Service.inteface;
 using GerencidorDeEventos.Service.Validations;
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace GerencidorDeEventos.Service
@@ -40,7 +41,7 @@ namespace GerencidorDeEventos.Service
                 var erromessage = new ErroMessage("Não é possivel atualizar o evento, a atualização deve ser feita antes da data de inicio");
                 return erromessage;
             }
-            if (evf.DataInicio.Day > evf.DataFim.Day)
+            if (evf.DataInicio > evf.DataFim)
             {
                 var erromessage = new ErroMessage("a data do evento não pode ser retrocedente a data final");
                 return erromessage;
@@ -86,21 +87,28 @@ namespace GerencidorDeEventos.Service
 
         public async Task<dynamic> CriarEventoService(EventoFilter evf)
         {
-            if (evf.DataInicio.Day > evf.DataFim.Day)
+
+            if (evf.DataInicio > evf.DataFim)
             {
                 var Erromessage = new ErroMessage("a data do evento não pode ser retrocedente a data final");
                 return Erromessage;
             }
-            else if (evf.DataInicio.Day < DateTime.Now.Day)
+            else if (evf.DataInicio < DateTime.Now)
             {
-                var Erromessage = new ErroMessage("A data do evento não pode ser menos que a data atual");
+                var Erromessage = new ErroMessage("A data do evento não pode ser retrocedente que a data atual");
                 return Erromessage;
             }
-            else if (evf.DataLimiteInscricao.Day + 1 >= evf.DataInicio.Day)
+            else if (evf.DataLimiteInscricao.AddDays(1) > evf.DataInicio)
             {
                 var Erromessage = new ErroMessage("A data limite da escrição deve ser de pelo menos 1 dia");
                 return Erromessage;
             }
+            else if (evf.DataLimiteInscricao < DateTime.Now)
+            {
+                var Erromessage = new ErroMessage("A data limite da inscrição não pode ser menor que hoje");
+                return Erromessage;
+            }
+
             if (!ValidaEmailService.VerificaEmail(evf.Email))
             {
                 var Erromessage = new ErroMessage("E-mail incorreto, por favor digitar um e-mail válido");
@@ -120,7 +128,7 @@ namespace GerencidorDeEventos.Service
             {
                 var Erromessage = new ErroMessage("Nome, descrição e NomeResponsavel não podem ser 'string' digite nomes válidos");
                 return Erromessage;
-            }
+            }        
 
             var evento = new Evento(evf.Nome, evf.DataInicio, evf.DataFim, evf.Descricao, evf.NomeResponsavel, evf.CpfResponsavel, evf.Email, evf.NumVagas, evf.DataLimiteInscricao);
             var evr = await _eventoRepository.CriarEvento(evento);
@@ -170,7 +178,7 @@ namespace GerencidorDeEventos.Service
 
             foreach(var mc in minicurso)
             {
-                var mcdto = new MinicursoDto(mc.EventoId, mc.Nome, mc.Descricao, mc.DataInicio.ToString(), mc.DataInicio.ToString("HH.mm"), mc.DataFim.Hour.ToString("HH.mm"), mc.Palestrante, mc.CurriculoPalestrante, mc.QuantidadeDeVagas, mc.LimiteInscricao.ToString());
+                var mcdto = new MinicursoDto(mc.EventoId, mc.Id, mc.Nome, mc.Descricao, mc.DataInicio.ToString(), mc.DataInicio.ToString("HH.mm"), mc.DataFim.Hour.ToString("HH.mm"), mc.Palestrante, mc.CurriculoPalestrante, mc.QuantidadeDeVagas, mc.LimiteInscricao.ToString());
                 mcdto.id_evento = null;
                 minicursoDto.Add(mcdto);
             }
@@ -180,7 +188,7 @@ namespace GerencidorDeEventos.Service
 
             foreach (var pl in palestras)
             {
-                var pldto = new PalestraDto(pl.EventoId, pl.Nome, pl.Descricao, pl.DataInicio.ToString(), pl.DataInicio.ToString("HH.mm"), pl.DataFim.Hour.ToString("HH.mm"), pl.Palestrante, pl.CurriculoPalestrante);
+                var pldto = new PalestraDto(pl.EventoId, pl.Id, pl.Nome, pl.Descricao, pl.DataInicio.ToString(), pl.DataInicio.ToString("HH.mm"), pl.DataFim.Hour.ToString("HH.mm"), pl.Palestrante, pl.CurriculoPalestrante);
                 pldto.id_evento = null;
                 palestrasDto.Add(pldto);
             }
@@ -204,7 +212,7 @@ namespace GerencidorDeEventos.Service
                     var Erromessage = new ErroMessage("Evento não encontrado com esse ID");
                     return Erromessage;
                 }
-                if (evento.DataInicio.Day == DateTime.Now.Day)
+                if (evento.DataInicio == DateTime.Now)
                 {
                     var Erromessage = new ErroMessage("O evento só pode ser removida antes da data de inicio");
                     return Erromessage;
