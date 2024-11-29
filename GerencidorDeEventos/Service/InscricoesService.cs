@@ -238,101 +238,101 @@ namespace GerencidorDeEventos.Service
         #endregion
 
         #region Palestra
-        public async Task<dynamic> InscricaoPalestraService(int IdPalestra, string token)
-        {
+        //public async Task<dynamic> InscricaoPalestraService(int IdPalestra, string token)
+        //{
 
-            var id = TokenService.GetIdFromToken(token);
-            var palestra = await _palestraRepository.GetPalestrasById(IdPalestra);
-            var usuario = await _usuarioRepository.GetUsuarioById(int.Parse(id));
-            var usuariosEvento = _inscricoesRepository.ObterUsuariosInscritosEvento(palestra.EventoId);
-            var usuariosPalestra = _inscricoesRepository.ObterUsuariosInscritosPalestra(IdPalestra);
-            var inscricaoEvento = await _inscricoesRepository.GetInscricao(palestra.EventoId, usuario.Id);
+        //    var id = TokenService.GetIdFromToken(token);
+        //    var palestra = await _palestraRepository.GetPalestrasById(IdPalestra);
+        //    var usuario = await _usuarioRepository.GetUsuarioById(int.Parse(id));
+        //    var usuariosEvento = _inscricoesRepository.ObterUsuariosInscritosEvento(palestra.EventoId);
+        //    var usuariosPalestra = _inscricoesRepository.ObterUsuariosInscritosPalestra(IdPalestra);
+        //    var inscricaoEvento = await _inscricoesRepository.GetInscricao(palestra.EventoId, usuario.Id);
 
-            if (!usuariosEvento.Any(u => u.Id == usuario.Id))
-            {
-                var erromessage = new ErroMessage("usuário precisa ta inscrito no evento");
-                return erromessage;
-            }
+        //    if (!usuariosEvento.Any(u => u.Id == usuario.Id))
+        //    {
+        //        var erromessage = new ErroMessage("usuário precisa ta inscrito no evento");
+        //        return erromessage;
+        //    }
 
-            if (usuariosPalestra.Any(u => u.Id == usuario.Id))
-            {
-                var erromessage = new ErroMessage("usuário Já inscrito na Palestra");
-                return erromessage;
-            }
+        //    if (usuariosPalestra.Any(u => u.Id == usuario.Id))
+        //    {
+        //        var erromessage = new ErroMessage("usuário Já inscrito na Palestra");
+        //        return erromessage;
+        //    }
 
-            if (palestra == null)
-            {
-                var Erromessage = new ErroMessage("Palestra não Encontrada, por favor digite outro ID");
-                return Erromessage;
-            }           
+        //    if (palestra == null)
+        //    {
+        //        var Erromessage = new ErroMessage("Palestra não Encontrada, por favor digite outro ID");
+        //        return Erromessage;
+        //    }           
 
-            var inscricao = new InscricaoPalestra
-            {
-                PalestraId = palestra.Id,
-                UsuarioId = usuario.Id,
-                Telefone = inscricaoEvento.Telefone,
-                email = usuario.Email
+        //    var inscricao = new InscricaoPalestra
+        //    {
+        //        PalestraId = palestra.Id,
+        //        UsuarioId = usuario.Id,
+        //        Telefone = inscricaoEvento.Telefone,
+        //        email = usuario.Email
 
-            };
+        //    };
 
-            var inscrito = await _inscricoesRepository.CriarInscricaoPalestra(inscricao);
-            return inscrito;
+        //    var inscrito = await _inscricoesRepository.CriarInscricaoPalestra(inscricao);
+        //    return inscrito;
 
-        }
+        //}
 
-        public async Task<dynamic> RemoveIncricaoPalestra(int Idpalestra, int id_usuario)
-        {
-            var palestra = await _palestraRepository.GetPalestrasById(Idpalestra);
-            var usuarios = _inscricoesRepository.ObterUsuariosInscritosPalestra(Idpalestra);
-            var usuario = usuarios.FirstOrDefault(u => u.Id == id_usuario);
+        //public async Task<dynamic> RemoveIncricaoPalestra(int Idpalestra, int id_usuario)
+        //{
+        //    var palestra = await _palestraRepository.GetPalestrasById(Idpalestra);
+        //    var usuarios = _inscricoesRepository.ObterUsuariosInscritosPalestra(Idpalestra);
+        //    var usuario = usuarios.FirstOrDefault(u => u.Id == id_usuario);
 
-            if (palestra == null)
-            {
-                var Erromessage = new ErroMessage("Não foi encontrado Palestra com o id digitado");
-                return Erromessage;
-            }
-            if (usuario == null)
-            {
-                var Erromessage = new ErroMessage("Usuário não está cadastrado na Palestra");
-                return Erromessage;
-            }
-            if (palestra.DataInicio.AddDays(1) <= DateTime.Now)
-            {
-                var Erromessage = new ErroMessage("O cancelamento da inscrição deve ser feita com 24 horas de antecedência");
-                return Erromessage;
-            }
+        //    if (palestra == null)
+        //    {
+        //        var Erromessage = new ErroMessage("Não foi encontrado Palestra com o id digitado");
+        //        return Erromessage;
+        //    }
+        //    if (usuario == null)
+        //    {
+        //        var Erromessage = new ErroMessage("Usuário não está cadastrado na Palestra");
+        //        return Erromessage;
+        //    }
+        //    if (palestra.DataInicio.AddDays(1) <= DateTime.Now)
+        //    {
+        //        var Erromessage = new ErroMessage("O cancelamento da inscrição deve ser feita com 24 horas de antecedência");
+        //        return Erromessage;
+        //    }
 
-            var inscricaoRemovida = await _inscricoesRepository.RemoverInscricaoPalestra(palestra.Id, usuario.Id);
+        //    var inscricaoRemovida = await _inscricoesRepository.RemoverInscricaoPalestra(palestra.Id, usuario.Id);
 
-            if (inscricaoRemovida == false)
-            {
-                var Erromessage = new ErroMessage("Não foi possível remover a inscrição");
-                return Erromessage;
-            }
-            return inscricaoRemovida;
+        //    if (inscricaoRemovida == false)
+        //    {
+        //        var Erromessage = new ErroMessage("Não foi possível remover a inscrição");
+        //        return Erromessage;
+        //    }
+        //    return inscricaoRemovida;
 
-        }
+        //}
 
-        public async Task<dynamic> GetTodosOsInscritosPalestra(int id_palestra)
-        {
-            var palestra = await _palestraRepository.GetPalestrasById(id_palestra);
+        //public async Task<dynamic> GetTodosOsInscritosPalestra(int id_palestra)
+        //{
+        //    var palestra = await _palestraRepository.GetPalestrasById(id_palestra);
 
-            if (palestra == null)
-            {
-                var Erromessage = new ErroMessage("Não existe palestra com o Id digitado");
-                return Erromessage;
-            }
+        //    if (palestra == null)
+        //    {
+        //        var Erromessage = new ErroMessage("Não existe palestra com o Id digitado");
+        //        return Erromessage;
+        //    }
 
-            var inscritos = _inscricoesRepository.ObterUsuariosInscritosPalestra(id_palestra);
+        //    var inscritos = _inscricoesRepository.ObterUsuariosInscritosPalestra(id_palestra);
 
-            if (inscritos == null)
-            {
-                var Erromessage = new ErroMessage("Não existe inscritos na palestra digitado");
-                return Erromessage;
-            }
+        //    if (inscritos == null)
+        //    {
+        //        var Erromessage = new ErroMessage("Não existe inscritos na palestra digitado");
+        //        return Erromessage;
+        //    }
 
-            return inscritos;
-        }
+        //    return inscritos;
+        //}
         #endregion
     }
 }

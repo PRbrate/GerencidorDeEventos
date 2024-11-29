@@ -28,9 +28,8 @@ namespace GerencidorDeEventos.Service
                 var usuarioBanco = await _usuarioRepository.GetUsuarioById(id);
 
                 var taskId = TokenService.GetIdFromToken(token) == id.ToString();
-                var taskRole = TokenService.GetRoleFromToken(token);
 
-                if (taskId == false && taskRole == "False")
+                if (taskId == false)
                 {
                     var Erromessage = new ErroMessage("Você só pode fazer alteração do seu prório Usuário");
                     return Erromessage;
@@ -141,7 +140,7 @@ namespace GerencidorDeEventos.Service
 
                 if (user == null)
                 {
-                    var Erromessage = new ErroMessage("Usuário não encontrado com esse CPF");
+                    var Erromessage = new ErroMessage("Usuário não encontrado com esse ID");
                     return Erromessage;
                 }
 

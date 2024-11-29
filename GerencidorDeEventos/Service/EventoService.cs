@@ -46,12 +46,12 @@ namespace GerencidorDeEventos.Service
                 var erromessage = new ErroMessage("a data do evento não pode ser retrocedente a data final");
                 return erromessage;
             }
-            else if (evf.DataInicio.Day < DateTime.Now.Day)
+            else if (evf.DataInicio < DateTime.Now)
             {
                 var erromessage = new ErroMessage("A data do evento não pode ser menos que a data atual");
                 return erromessage;
             }
-            else if (evf.DataLimiteInscricao.Day + 1 >= evf.DataInicio.Day)
+            else if (evf.DataLimiteInscricao.AddDays(1) >= evf.DataInicio)
             {
                 var Erromessage = new ErroMessage("A data limite da escrição deve ser de pelo menos 1 dia");
                 return Erromessage;

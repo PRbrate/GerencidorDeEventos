@@ -9,8 +9,8 @@
         Task<dynamic> RemoveIncricaoMinicurso(int Idminicurso, int id_usuario);
         Task<dynamic> GetTodosOsInscritosMinicurso(int id_minicurso);
 
-        Task<dynamic> InscricaoPalestraService(int IdPalestra, string token);
-        Task<dynamic> RemoveIncricaoPalestra(int Idpalestra, int id_usuario);
-        Task<dynamic> GetTodosOsInscritosPalestra(int id_palestra);
+        //Task<dynamic> InscricaoPalestraService(int IdPalestra, string token);
+        //Task<dynamic> RemoveIncricaoPalestra(int Idpalestra, int id_usuario);
+        //Task<dynamic> GetTodosOsInscritosPalestra(int id_palestra);
     }
 }

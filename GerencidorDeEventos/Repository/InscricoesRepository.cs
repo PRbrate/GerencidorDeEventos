@@ -108,42 +108,42 @@ namespace GerencidorDeEventos.Repository
         #endregion
 
         #region Palestra
-        public async Task<InscricaoPalestra> CriarInscricaoPalestra(InscricaoPalestra inscricaoPalestra)
-        {
-            var response = await _dbcontext.InscricoesPalestra.AddAsync(inscricaoPalestra);
-            await _dbcontext.SaveChangesAsync();
-            return inscricaoPalestra;
-        }
+        //public async Task<InscricaoPalestra> CriarInscricaoPalestra(InscricaoPalestra inscricaoPalestra)
+        //{
+        //    var response = await _dbcontext.InscricoesPalestra.AddAsync(inscricaoPalestra);
+        //    await _dbcontext.SaveChangesAsync();
+        //    return inscricaoPalestra;
+        //}
 
-        public async Task<bool> RemoverInscricaoPalestra(int palestraId, int usuarioId)
-        {
-            var inscricao = _dbcontext.InscricoesPalestra
-             .FirstOrDefault(i => i.PalestraId == palestraId && i.UsuarioId == usuarioId);
+        //public async Task<bool> RemoverInscricaoPalestra(int palestraId, int usuarioId)
+        //{
+        //    var inscricao = _dbcontext.InscricoesPalestra
+        //     .FirstOrDefault(i => i.PalestraId == palestraId && i.UsuarioId == usuarioId);
 
-            if (inscricao == null)
-            {
-                return false;
-            }
+        //    if (inscricao == null)
+        //    {
+        //        return false;
+        //    }
 
-            _dbcontext.InscricoesPalestra.Remove(inscricao);
-            _dbcontext.SaveChanges();
-            return true;
-        }
+        //    _dbcontext.InscricoesPalestra.Remove(inscricao);
+        //    _dbcontext.SaveChanges();
+        //    return true;
+        //}
 
-        public bool PalestraTemParticipante(int palestraId)
-        {
-            return _dbcontext.InscricoesPalestra.Any(i => i.PalestraId == palestraId);
-        }
+        //public bool PalestraTemParticipante(int palestraId)
+        //{
+        //    return _dbcontext.InscricoesPalestra.Any(i => i.PalestraId == palestraId);
+        //}
 
-        public List<Usuario> ObterUsuariosInscritosPalestra(int palestraId)
-        {
-            var palestra = _dbcontext.Palestras
-            .Include(e => e.Inscricoes)
-            .ThenInclude(i => i.Usuario)
-            .FirstOrDefault(e => e.Id == palestraId);
+        //public List<Usuario> ObterUsuariosInscritosPalestra(int palestraId)
+        //{
+        //    var palestra = _dbcontext.Palestras
+        //    .Include(e => e.Inscricoes)
+        //    .ThenInclude(i => i.Usuario)
+        //    .FirstOrDefault(e => e.Id == palestraId);
 
-            return palestra?.Inscricoes.Select(i => i.Usuario).ToList() ?? new List<Usuario>();
-        }
+        //    return palestra?.Inscricoes.Select(i => i.Usuario).ToList() ?? new List<Usuario>();
+        //}
 
         #endregion
 

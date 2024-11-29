@@ -210,99 +210,99 @@ namespace GerencidorDeEventos.Controllers
         #endregion
 
         #region Palestras
-        [HttpPost("palestra")]
-        public async Task<IActionResult> InscricaoPalestra(int idPalestra)
-        {
-            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        //[HttpPost("palestra")]
+        //public async Task<IActionResult> InscricaoPalestra(int idPalestra)
+        //{
+        //    var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-            try
-            {
-                var inscricao = await _inscricaoService.InscricaoPalestraService(idPalestra, token);
+        //    try
+        //    {
+        //        var inscricao = await _inscricaoService.InscricaoPalestraService(idPalestra, token);
 
-                if (inscricao is ErroMessage erro)
-                {
-                    return UnprocessableEntity(erro.Message);
+        //        if (inscricao is ErroMessage erro)
+        //        {
+        //            return UnprocessableEntity(erro.Message);
 
-                }
-                else if (inscricao is InscricaoPalestra inscricao1)
-                {
-                    return Ok(new
-                    {
-                        id_palestra = inscricao1.PalestraId,
-                        id_usuario_participante = inscricao1.UsuarioId
-                    });
-                }
-                return BadRequest("Não foi possível Processar sua requisição");
+        //        }
+        //        else if (inscricao is InscricaoPalestra inscricao1)
+        //        {
+        //            return Ok(new
+        //            {
+        //                id_palestra = inscricao1.PalestraId,
+        //                id_usuario_participante = inscricao1.UsuarioId
+        //            });
+        //        }
+        //        return BadRequest("Não foi possível Processar sua requisição");
 
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { msg = ex.Message });
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { msg = ex.Message });
+        //    }
+        //}
 
-        [HttpDelete("palestra/{id_palestra}/{id_usuario_participante}")]
-        [Authorize(Roles = "True")]
-        public async Task<IActionResult> RemoveInscricaoPalestra(int id_palestra, int id_usuario_participante)
-        {
+        //[HttpDelete("palestra/{id_palestra}/{id_usuario_participante}")]
+        //[Authorize(Roles = "True")]
+        //public async Task<IActionResult> RemoveInscricaoPalestra(int id_palestra, int id_usuario_participante)
+        //{
 
-            try
-            {
-                var inscricao = await _inscricaoService.RemoveIncricaoPalestra(id_palestra, id_usuario_participante);
+        //    try
+        //    {
+        //        var inscricao = await _inscricaoService.RemoveIncricaoPalestra(id_palestra, id_usuario_participante);
 
-                if (inscricao is ErroMessage erro)
-                {
-                    return UnprocessableEntity(erro.Message);
+        //        if (inscricao is ErroMessage erro)
+        //        {
+        //            return UnprocessableEntity(erro.Message);
 
-                }
-                return Ok();
+        //        }
+        //        return Ok();
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { msg = ex.Message });
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { msg = ex.Message });
+        //    }
+        //}
 
-        [HttpGet("palestra/{id_palestra}")]
-        [Authorize(Roles = "True")]
-        public async Task<IActionResult> GetTodosOsInscritosPalestra(int id_palestra)
-        {
+        //[HttpGet("palestra/{id_palestra}")]
+        //[Authorize(Roles = "True")]
+        //public async Task<IActionResult> GetTodosOsInscritosPalestra(int id_palestra)
+        //{
 
-            try
-            {
-                var inscricao = await _inscricaoService.GetTodosOsInscritosPalestra(id_palestra);
+        //    try
+        //    {
+        //        var inscricao = await _inscricaoService.GetTodosOsInscritosPalestra(id_palestra);
 
-                if (inscricao is ErroMessage erro)
-                {
-                    return UnprocessableEntity(erro.Message);
+        //        if (inscricao is ErroMessage erro)
+        //        {
+        //            return UnprocessableEntity(erro.Message);
 
-                }
-                else if (inscricao is List<Usuario> user)
-                {
-                    var resultado = user.Select(usuario => new
-                    {
-                        cpf_participante = usuario.Cpf,
-                        nome_participante = usuario.Nome,
-                        email_participante = usuario.Email
+        //        }
+        //        else if (inscricao is List<Usuario> user)
+        //        {
+        //            var resultado = user.Select(usuario => new
+        //            {
+        //                cpf_participante = usuario.Cpf,
+        //                nome_participante = usuario.Nome,
+        //                email_participante = usuario.Email
 
-                    }).ToList();
+        //            }).ToList();
 
-                    return Ok(new
-                    {
-                        id_palestra = id_palestra,
-                        resultado
-                    });
-                }
-                return BadRequest("Não foi possivel processar sua requisição");
+        //            return Ok(new
+        //            {
+        //                id_palestra = id_palestra,
+        //                resultado
+        //            });
+        //        }
+        //        return BadRequest("Não foi possivel processar sua requisição");
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { msg = ex.Message });
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { msg = ex.Message });
+        //    }
+        //}
         #endregion
     }
 }

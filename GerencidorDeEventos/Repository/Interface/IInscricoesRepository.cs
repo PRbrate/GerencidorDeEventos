@@ -17,10 +17,10 @@ namespace GerencidorDeEventos.Repository.Interface
         bool MinicursoTemParticipante(int minicursoId);
         List<Usuario> ObterUsuariosInscritosMinicurso(int minicursoid);
 
-        Task<InscricaoPalestra> CriarInscricaoPalestra(InscricaoPalestra inscricaoPalestra);
-        Task<bool> RemoverInscricaoPalestra(int palestraId, int usuarioId);
-        bool PalestraTemParticipante(int palestraId);
-        List<Usuario> ObterUsuariosInscritosPalestra(int palestraId);
+        //Task<InscricaoPalestra> CriarInscricaoPalestra(InscricaoPalestra inscricaoPalestra);
+        //Task<bool> RemoverInscricaoPalestra(int palestraId, int usuarioId);
+        //bool PalestraTemParticipante(int palestraId);
+        //List<Usuario> ObterUsuariosInscritosPalestra(int palestraId);
 
     }
 }
