@@ -163,12 +163,12 @@ namespace GerencidorDeEventos.Service
                     var Erromessage = new ErroMessage("O Palestra só pode ser removido antes da data de inicio");
                     return Erromessage;
                 }
-                if (_palestraRepository.PalestraTemParticipante(palestra.Id))
-                {
-                    var Erromessage = new ErroMessage("a Palestra não pode ser removida pois tem participantes incritos");
-                    return Erromessage;
+                //if (_palestraRepository.PalestraTemParticipante(palestra.Id))
+                //{
+                //    var Erromessage = new ErroMessage("a Palestra não pode ser removida pois tem participantes incritos");
+                //    return Erromessage;
 
-                }
+                //}
                 var remove = _palestraRepository.RemoverPalestra(palestra);
 
                 if (!remove.IsCompletedSuccessfully == false)
